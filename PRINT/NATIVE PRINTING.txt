@@ -1,0 +1,101 @@
+
+
+---i  Set application print server type
+
+Edit Application Properties > Report Printing > Print Server Type > Native Printing > Apply Changes
+
+---ii  Customize the Application
+
+--a  Classic Report
+
+Attributes > Printing > Enabled 
+
+--b Interactive Report (auto enabled)
+
+--c Interactive Grids (auto enabled)
+
+---iii Programmatic and Customizable Reports
+
+--a Faceted Search page (Classic Report Region)
+
+-1 Create a Static Select List Item with report formats XLSX, CSV, PDF, HTML, XML, PXML, JSON, PJSON
+
+-2 Create a Download button
+
+-3 Set Static ID for Faceted Search , enter faceted_search.
+
+-4 Create a Before Header process while (P3_FORMAT) item is not null and clicking on Download button
+
+declare
+    l_export       apex_data_export.t_export;
+    l_region_id    number;
+begin
+   select region_id into l_region_id
+     from apex_application_page_regions
+    where application_id = :APP_ID
+      and page_id = :APP_PAGE_ID
+      and static_id = 'faceted_search';
+    
+    l_export := apex_region.export_data (
+         p_format       => :P3_FORMAT,
+         p_page_id      => :APP_PAGE_ID,
+         p_region_id    => l_region_id);
+         
+    apex_data_export.download( l_export );
+end;
+ 
+-5 More customization on download 
+
+declare
+    l_highlights     apex_data_export.t_highlights;
+    l_context        apex_exec.t_context;
+    l_export         apex_data_export.t_export;
+    l_print_config    apex_data_export.t_print_config;
+begin
+    apex_data_export.add_highlight(
+        p_highlights          => l_highlights,
+        p_id                  => 1,
+        p_value_column        => 'HIGHLIGHT1',
+        p_display_column      => null,
+        p_text_color          => '#FFFF',
+        p_background_color    =>  '#F5B642');
+
+    l_context := apex_exec.open_query_context(
+        p_location    => apex_exec.c_location_local_db,
+        p_sql_query   => 'select ename as "Name ",
+                                job as "Job ",
+                                MGR as "Manager" ,
+                                Hiredate as "Hiredate ",
+                                sal as "Salary",
+                                case when sal >= 3000 then 1 end as HIGHLIGHT1,
+                                Comm as "Commision"
+                            from emp' );
+
+l_print_config := apex_data_export.get_print_config(
+        p_body_font_color             => '#4B4540',
+        p_page_header                 => 'Header',
+        p_page_header_font_color      => '#4B4540',
+        p_page_header_font_size       => 14,
+        p_page_header_font_weight     => apex_data_export.c_font_weight_bold,
+        p_page_footer                 => 'Footer',
+        p_page_footer_font_color      => '#4B4540',
+        p_page_footer_font_size       => 14,   
+        p_page_footer_font_weight     => apex_data_export.c_font_weight_bold,
+        p_border_width                => 1,
+        p_border_color                => '#4B4540');                            
+
+    l_export := apex_data_export.export (
+                        p_context      => l_context,
+                        p_format       => :P3_FORMAT,
+                        p_print_config => l_print_config,
+                        p_highlights   => l_highlights );
+
+    apex_exec.close( l_context );
+
+    apex_data_export.download( p_export => l_export );
+
+exception
+    when others then
+        apex_exec.close( l_context );
+        raise;
+end;

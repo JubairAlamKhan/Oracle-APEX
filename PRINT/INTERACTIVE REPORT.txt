@@ -1,0 +1,88 @@
+
+---i place this code in button's dynamic action execute javascript
+
+//// Collapse Left Navigation Bar If It Was Expanded ////
+var navCollapsed = 0;
+if ($("body").hasClass("js-navExpanded")) {
+    $("#t_Button_navControl").click();
+    navCollapsed = 1;
+};
+setTimeout(3000);
+
+
+
+//////// Hide ////////
+
+//Hide Navigation Bar List
+$("#t_Header").hide();
+
+//Hide Navigation Menu
+$("#t_Body_nav").hide();
+
+//Hide Breadcrumb
+$("#t_Body_title").hide();
+
+//Hide Content Offset
+$("#t_Body_content_offset").hide();
+
+//Hide Interactive Report Search Bar
+$(".a-IRR-toolbar").hide();
+
+//Hide Report Link Column Header
+$("#LINK").hide();
+
+//Hide Report Link Column Elements
+$('td[headers="LINK"]').hide();
+
+//Hide Buttons
+$(".t-Button").hide();
+
+//Hide Footer
+$(".t-Footer").hide();
+
+
+
+//////// Browser Print ////////
+window.print();
+
+
+
+//////// Show ////////
+
+//Show Navigation Bar List
+$("#t_Header").show();
+
+//Show Navigation Menu
+$("#t_Body_nav").show();
+
+//Show Breadcrumb
+$("#t_Body_title").show();
+
+//Show Content Offset
+$("#t_Body_content_offset").show();
+
+//Show Interactive Report Search Bar
+$(".a-IRR-toolbar").show();
+
+//Show Report Link Column Header
+$("#LINK").show();
+
+//Show Report Link Column Elements
+$('td[headers="LINK"]').show();
+
+//Show Buttons
+$(".t-Button").show();
+
+//Show Footer
+$(".t-Footer").show();
+
+
+
+//// Expand Left Navigation Bar If It Was Colapsed ////
+if ( navCollapsed == 1 ) {
+    $("#t_Button_navControl").click();
+}
+
+
+
+---ii In Interactive Report's Attributes, Change Heading Fixed To None
